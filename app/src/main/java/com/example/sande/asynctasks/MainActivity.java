@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     ProgressBar progressBar;
     ProgressDialog progressDialog;
+    MyTask myTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,33 +30,33 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyTask myTask = new MyTask();
+                myTask = new MyTask();
                 myTask.execute();
             }
         });
     }
 
-    public class MyTask extends AsyncTask<String,Integer,String>
-    {
+    public class MyTask extends AsyncTask<String, Integer, String> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = ProgressDialog.show(MainActivity.this,"title","running");
-
-
+            progressDialog = ProgressDialog.show(MainActivity.this, "title", "running ");
+            tv.setText("Task starting ..... ");
         }
 
         @Override // runs on background thread
         protected String doInBackground(String... strings) {
-            for(int i =0; i<100;i++)
-            {
+
+
+            for (int i = 0; i < 5;i++) {
                 value = i;
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                onProgressUpdate(value);
+
+                publishProgress(value);
             }
             String result = "My download has finished";
 
@@ -66,9 +67,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
+
             int myValue = values[0];
-            tv.setText("" + myValue);
+            tv.setText("" + myValue + "%");
             progressBar.setProgress(myValue);
+
+
         }
 
         @Override
@@ -77,5 +81,12 @@ public class MainActivity extends AppCompatActivity {
             progressDialog.dismiss();
             tv.setText(s);
         }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myTask.cancel(true);
     }
 }
